@@ -12,14 +12,37 @@ import cn.meshed.framework.beans.factory.config.BeanDefinition;
  */
 public abstract class AbstractBeanFactory extends DefaultSingletonBeanFactory implements BeanFactory {
 
+
+    /**
+     * 获取bean
+     *
+     * @param beanName
+     * @return Object
+     * @throws BeansException
+     */
     @Override
     public Object getBean(String beanName) throws BeansException {
+        return doGetBean(beanName,null);
+    }
+
+    /**
+     * 获取bean
+     * @param beanName
+     * @return Object
+     * @throws BeansException
+     */
+    @Override
+    public Object getBean(String beanName, Object... args) throws BeansException {
+        return doGetBean(beanName, args);
+    }
+
+    protected Object doGetBean(String beanName, Object... args) throws BeansException {
         Object bean = getSingleton(beanName);
         if (bean != null){
             return bean;
         }
         BeanDefinition beanDefinition = getBeanDefinition(beanName);
-        return createBean(beanName,beanDefinition);
+        return createBean(beanName,beanDefinition,args);
     }
 
     /**
@@ -29,7 +52,7 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanFactory im
      * @param beanDefinition
      * @return
      */
-    protected abstract Object createBean(String beanName, BeanDefinition beanDefinition) throws BeansException;
+    protected abstract Object createBean(String beanName, BeanDefinition beanDefinition, Object[] args) throws BeansException;
 
     /**
      * 获取bean 定义

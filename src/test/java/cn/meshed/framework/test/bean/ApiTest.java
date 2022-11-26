@@ -26,4 +26,19 @@ public class ApiTest {
         UserService userService_singleton = (UserService) beanFactory.getBean("userService");
         userService_singleton.queryUserInfo();
     }
+
+    @Test
+    public void testCglib(){
+        //1.初始化BeanFactory
+        DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
+        //2.注册Bean对象
+        BeanDefinition beanDefinition = new BeanDefinition(BookService.class);
+        beanFactory.registryBeanDefinition("bookService",beanDefinition);
+        //3.获取Bean对象
+        BookService bookService = (BookService) beanFactory.getBean("bookService","Spring");
+        bookService.queryBookInfo();
+        //再次调用
+        BookService bookService_singleton = (BookService) beanFactory.getBean("bookService","Spring");
+        bookService_singleton.queryBookInfo();
+    }
 }
