@@ -3,6 +3,7 @@ package cn.meshed.framework.beans.factory.support;
 import cn.meshed.framework.beans.BeansException;
 import cn.meshed.framework.beans.factory.ConfigurableListableBeanFactory;
 import cn.meshed.framework.beans.factory.config.BeanDefinition;
+import cn.meshed.framework.beans.factory.config.BeanPostProcessor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,6 +33,17 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
         }
         return beanDefinition;
     }
+
+    /**
+     * 预先初始化Bean
+     *
+     * @throws BeansException
+     */
+    @Override
+    public void preInstantiateSingletons() throws BeansException {
+        beanDefinitionMap.keySet().forEach(this::getBean);
+    }
+
 
     /**
      * 判断是否包含指定名称的BeanDefinition

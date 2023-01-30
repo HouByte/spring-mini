@@ -4,7 +4,9 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.meshed.framework.beans.BeansException;
 import cn.meshed.framework.beans.PropertyValue;
 import cn.meshed.framework.beans.PropertyValues;
+import cn.meshed.framework.beans.factory.config.AutowireCapableBeanFactory;
 import cn.meshed.framework.beans.factory.config.BeanDefinition;
+import cn.meshed.framework.beans.factory.config.BeanPostProcessor;
 import cn.meshed.framework.beans.factory.config.BeanReference;
 
 import java.lang.reflect.Constructor;
@@ -15,7 +17,7 @@ import java.lang.reflect.Constructor;
  * @author Vincent Vic
  * @version 1.0
  */
-public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFactory {
+public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFactory implements AutowireCapableBeanFactory {
 
     private InstantiationStrategy instantiationStrategy = new CglibSubclassingInstantiationStrategy();
 
@@ -33,6 +35,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             bean = createBeanInstance(beanDefinition, beanName, args);
             //填充属性
             applyPropertyValues(beanName, bean, beanDefinition);
+            // 执行 Bean 的初始化方法和 BeanPostProcessor 的前置和后置处理方法
+            bean = initializeBean(beanName, bean, beanDefinition);
         } catch (Exception e) {
             throw new BeansException("Instantiation of bean failed", e);
         }
@@ -59,7 +63,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
                 break;
             }
         }
-        return instantiationStrategy.instantiate(beanDefinition, beanName, constructorToUes, args);
+        return getInstantiationStrategy().instantiate(beanDefinition, beanName, constructorToUes, args);
     }
 
 
@@ -95,5 +99,70 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
     public void setInstantiationStrategy(InstantiationStrategy instantiationStrategy) {
         this.instantiationStrategy = instantiationStrategy;
+    }
+
+    private Object initializeBean(String beanName,Object bean,BeanDefinition beanDefinition){
+        // 1. 执行 BeanPostProcessor Before 处理
+        Object wrappedBean = applyBeanPostProcessorsBeforeInitialization(bean, beanName);
+
+        // 2.调用初始化方法
+        invokeInitMethods(beanName,wrappedBean,beanDefinition);
+
+        // 3. 执行 BeanPostProcessor After 处理
+        wrappedBean = applyBeanPostProcessorsAfterInitialization(bean, beanName);
+        return wrappedBean;
+    }
+
+    /**
+     * 调用初始化方法 待实现
+     *
+     * @param beanName bean 名称
+     * @param wrappedBean 包装bean对象
+     * @param beanDefinition bean定义
+     */
+    private void invokeInitMethods(String beanName, Object wrappedBean, BeanDefinition beanDefinition) {
+
+    }
+
+    /**
+     * 执行 BeanPostProcessors 接口实现类的 postProcessBeforeInitialization 方法
+     *
+     * @param existingBean 扩展Bean
+     * @param beanName     Bean名称
+     * @return {@link Object}
+     * @throws BeansException
+     */
+    @Override
+    public Object applyBeanPostProcessorsBeforeInitialization(Object existingBean, String beanName) throws BeansException {
+        Object result = existingBean;
+        for (BeanPostProcessor processor : getBeanPostProcessors()) {
+            Object current = processor.postProcessBeforeInitialization(result, beanName);
+            if (null == current) {
+                return result;
+            }
+            result = current;
+        }
+        return result;
+    }
+
+    /**
+     * 执行 BeanPostProcessors 接口实现类的 postProcessorsAfterInitialization 方法
+     *
+     * @param existingBean 扩展Bean
+     * @param beanName     Bean名称
+     * @return {@link Object}
+     * @throws BeansException
+     */
+    @Override
+    public Object applyBeanPostProcessorsAfterInitialization(Object existingBean, String beanName) throws BeansException {
+        Object result = existingBean;
+        for (BeanPostProcessor processor : getBeanPostProcessors()) {
+            Object current = processor.postProcessAfterInitialization(result, beanName);
+            if (null == current) {
+                return result;
+            }
+            result = current;
+        }
+        return result;
     }
 }
