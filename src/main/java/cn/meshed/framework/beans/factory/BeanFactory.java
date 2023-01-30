@@ -12,17 +12,28 @@ public interface BeanFactory {
 
     /**
      * 获取bean
-     * @param beanName
-     * @return Object
+     * @param beanName Bean名称
+     * @return {@link Object}
      * @throws BeansException
      */
     Object getBean(String beanName) throws BeansException;
 
     /**
      * 获取bean
-     * @param beanName
-     * @return Object
+     * @param beanName Bean名称
+     * @return {@link Object}
      * @throws BeansException
      */
     Object getBean(String beanName,Object... args) throws BeansException;
+
+    /**
+     * 根据需要类型获取bean
+     *
+     * @param beanName Bean名称
+     * @param requiredType 指定类型
+     * @return {@link T}
+     * @param <T>
+     * @throws BeansException
+     */
+    <T> T getBean(String beanName, Class<T> requiredType) throws BeansException;
 }

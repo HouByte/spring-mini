@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans>
+
+    <bean id="userDao" class="cn.meshed.framework.test.context.UserDao"/>
+
+    <bean id="userService" class="cn.meshed.framework.test.context.UserService">
+        <property name="uid" value="001"/>
+        <property name="userDao" ref="userDao"/>
+    </bean>
+
+    <bean class="cn.meshed.framework.test.context.PrintBeanPostProcessor"/>
+    <bean class="cn.meshed.framework.test.context.PrintBeanFactoryPostProcessor"/>
+
+</beans>

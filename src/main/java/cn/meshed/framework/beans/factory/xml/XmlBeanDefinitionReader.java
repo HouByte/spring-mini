@@ -78,6 +78,19 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
     }
 
     /**
+     * 根据多个位置加载Bean定义
+     *
+     * @param locations 位置
+     * @throws BeansException bean 加载异常
+     */
+    @Override
+    public void loadBeanDefinitions(String... locations) throws BeansException {
+        for (String location : locations) {
+            loadBeanDefinitions(location);
+        }
+    }
+
+    /**
      * 处理加载Bean定义核心方法
      * @param inputStream
      * @throws ClassNotFoundException

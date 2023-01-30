@@ -1,8 +1,12 @@
 package cn.meshed.framework.beans.factory.support;
 
 import cn.meshed.framework.beans.BeansException;
-import cn.meshed.framework.beans.factory.BeanFactory;
 import cn.meshed.framework.beans.factory.config.BeanDefinition;
+import cn.meshed.framework.beans.factory.config.BeanPostProcessor;
+import cn.meshed.framework.beans.factory.config.ConfigurableBeanFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <h1>Abstract BeanFactory</h1>
@@ -10,8 +14,12 @@ import cn.meshed.framework.beans.factory.config.BeanDefinition;
  * @author Vincent Vic
  * @version 1.0
  */
-public abstract class AbstractBeanFactory extends DefaultSingletonBeanFactory implements BeanFactory {
+public abstract class AbstractBeanFactory extends DefaultSingletonBeanFactory implements ConfigurableBeanFactory {
 
+    /**
+     * BeanPostProcessors to apply in createBean
+     */
+    private final List<BeanPostProcessor> beanPostProcessors = new ArrayList<>();
 
     /**
      * 获取bean
@@ -34,6 +42,39 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanFactory im
     @Override
     public Object getBean(String beanName, Object... args) throws BeansException {
         return doGetBean(beanName, args);
+    }
+
+    /**
+     * 根据需要类型获取bean
+     *
+     * @param beanName     Bean名称
+     * @param requiredType 指定类型
+     * @return {@link T}
+     * @throws BeansException
+     */
+    @Override
+    public <T> T getBean(String beanName, Class<T> requiredType) throws BeansException {
+        return (T) getBean(beanName);
+    }
+
+    /**
+     * 添加Bean扩展处理器
+     *
+     * @param beanPostProcessor
+     */
+    @Override
+    public void addBeanPostProcessor(BeanPostProcessor beanPostProcessor) {
+        this.beanPostProcessors.remove(beanPostProcessor);
+        this.beanPostProcessors.add(beanPostProcessor);
+    }
+
+    /**
+     * 返回BeanPostProcessor列表
+     *
+     * @return {@link BeanPostProcessor}
+     */
+    public List<BeanPostProcessor> getBeanPostProcessors() {
+        return beanPostProcessors;
     }
 
     protected Object doGetBean(String beanName, Object... args) throws BeansException {
