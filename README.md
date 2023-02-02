@@ -7,3 +7,4 @@
 - [三、Bean属性注入](docs/3.BeanReference-Injection.md) | [Tag 0.0.3](https://github.com/Vincent-Vic/spring-mini/releases/tag/0.0.3) | [Tree 0.0.3](https://github.com/Vincent-Vic/spring-mini/tree/0.0.3)
 - [四、资源加载并解析](docs/4.ResolveRegistration.md) | [Tag 0.0.4](https://github.com/Vincent-Vic/spring-mini/releases/tag/0.0.4) | [Tree 0.0.4](https://github.com/Vincent-Vic/spring-mini/tree/0.0.4)
 - [五、应用上下文](docs/5.ApplicationContext.md) | [Tag 0.0.5](https://github.com/Vincent-Vic/spring-mini/releases/tag/0.0.5) | [Tree 0.0.5](https://github.com/Vincent-Vic/spring-mini/tree/0.0.5)
+- [六、初始化与销毁](docs/6.Lifecycle.md) | [Tag 0.0.6](https://github.com/Vincent-Vic/spring-mini/releases/tag/0.0.6) | [Tree 0.0.6](https://github.com/Vincent-Vic/spring-mini/tree/0.0.6)
