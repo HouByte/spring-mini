@@ -3,7 +3,6 @@ package cn.meshed.framework.beans.factory.support;
 import cn.meshed.framework.beans.BeansException;
 import cn.meshed.framework.beans.factory.ConfigurableListableBeanFactory;
 import cn.meshed.framework.beans.factory.config.BeanDefinition;
-import cn.meshed.framework.beans.factory.config.BeanPostProcessor;
 
 import java.util.HashMap;
 import java.util.Map;

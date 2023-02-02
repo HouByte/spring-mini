@@ -9,7 +9,7 @@ import cn.meshed.framework.beans.factory.HierarchicalBeanFactory;
  * @author Vincent Vic
  * @version 1.0
  */
-public interface ConfigurableBeanFactory extends HierarchicalBeanFactory {
+public interface ConfigurableBeanFactory extends HierarchicalBeanFactory, SingletonBeanRegistry {
 
     /**
      * 单例
@@ -26,4 +26,9 @@ public interface ConfigurableBeanFactory extends HierarchicalBeanFactory {
      * @param beanPostProcessor
      */
     void addBeanPostProcessor(BeanPostProcessor beanPostProcessor);
+
+    /**
+     * 销毁单例Bean
+     */
+    void destroySingletons();
 }
