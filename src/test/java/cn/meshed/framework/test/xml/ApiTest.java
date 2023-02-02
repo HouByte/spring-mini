@@ -4,8 +4,6 @@ import cn.hutool.core.io.IoUtil;
 
 import cn.meshed.framework.beans.factory.support.DefaultListableBeanFactory;
 import cn.meshed.framework.beans.factory.xml.XmlBeanDefinitionReader;
-import cn.meshed.framework.context.ApplicationContext;
-import cn.meshed.framework.context.support.ClassPathXmlApplicationContext;
 import cn.meshed.framework.core.io.DefaultResourceLoader;
 import cn.meshed.framework.core.io.Resource;
 import org.junit.Before;
