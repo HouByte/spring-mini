@@ -6,7 +6,7 @@ package cn.meshed.framework.beans.factory.config;
  * @author Vincent Vic
  * @version 1.0
  */
-public interface SingletonBeanFactory {
+public interface SingletonBeanRegistry {
 
     /**
      * 获取单例

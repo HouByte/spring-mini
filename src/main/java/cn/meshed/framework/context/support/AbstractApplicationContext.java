@@ -115,6 +115,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 
         // 5.提前实例化单例Bean对象
         beanFactory.preInstantiateSingletons();
+
+        //6.注册生命周期钩子
+        registerShutdownHook();
     }
 
 
@@ -125,7 +128,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
      */
     private void invokeBeanFactoryPostProcessors(ConfigurableListableBeanFactory beanFactory) {
         Map<String, BeanFactoryPostProcessor> beanFactoryPostProcessorMap = beanFactory.getBeansOfType(BeanFactoryPostProcessor.class);
-        if (beanFactoryPostProcessorMap == null || beanFactoryPostProcessorMap.size() == 0){
+        if (beanFactoryPostProcessorMap == null || beanFactoryPostProcessorMap.size() == 0) {
             return;
         }
         beanFactoryPostProcessorMap.values()
@@ -139,9 +142,25 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
      */
     private void registerBeanPostProcessors(ConfigurableListableBeanFactory beanFactory) {
         Map<String, BeanPostProcessor> beanPostProcessorMap = beanFactory.getBeansOfType(BeanPostProcessor.class);
-        if (beanPostProcessorMap == null || beanPostProcessorMap.size() == 0){
+        if (beanPostProcessorMap == null || beanPostProcessorMap.size() == 0) {
             return;
         }
         beanPostProcessorMap.values().forEach(beanFactory::addBeanPostProcessor);
+    }
+
+    /**
+     * 注册关闭钩子
+     */
+    @Override
+    public void registerShutdownHook() {
+        Runtime.getRuntime().addShutdownHook(new Thread(this::close));
+    }
+
+    /**
+     * 容器关闭处理
+     */
+    @Override
+    public void close() {
+        getBeanFactory().destroySingletons();
     }
 }
