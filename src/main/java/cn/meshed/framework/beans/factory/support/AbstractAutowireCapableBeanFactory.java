@@ -5,8 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import cn.meshed.framework.beans.BeansException;
 import cn.meshed.framework.beans.PropertyValue;
 import cn.meshed.framework.beans.PropertyValues;
-import cn.meshed.framework.beans.factory.DisposableBean;
-import cn.meshed.framework.beans.factory.InitializingBean;
+import cn.meshed.framework.beans.factory.*;
 import cn.meshed.framework.beans.factory.config.AutowireCapableBeanFactory;
 import cn.meshed.framework.beans.factory.config.BeanDefinition;
 import cn.meshed.framework.beans.factory.config.BeanPostProcessor;
@@ -120,6 +119,20 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     }
 
     private Object initializeBean(String beanName, Object bean, BeanDefinition beanDefinition) {
+
+        // 1. 感知处理
+        if (bean instanceof Aware){
+            if (bean instanceof BeanFactoryAware) {
+                ((BeanFactoryAware)bean).setBeanFactory(this);
+            }
+            if (bean instanceof BeanClassLoaderAware) {
+                ((BeanClassLoaderAware)bean).setBeanClassLoader(getBeanClassLoader());
+            }
+            if (bean instanceof BeanNameAware) {
+                ((BeanNameAware)bean).setBeanName(beanName);
+            }
+        }
+
         // 1. 执行 BeanPostProcessor Before 处理
         Object wrappedBean = applyBeanPostProcessorsBeforeInitialization(bean, beanName);
 

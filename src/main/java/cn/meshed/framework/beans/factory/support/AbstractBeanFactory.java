@@ -4,6 +4,7 @@ import cn.meshed.framework.beans.BeansException;
 import cn.meshed.framework.beans.factory.config.BeanDefinition;
 import cn.meshed.framework.beans.factory.config.BeanPostProcessor;
 import cn.meshed.framework.beans.factory.config.ConfigurableBeanFactory;
+import cn.meshed.framework.utils.ClassUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,16 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
      * BeanPostProcessors to apply in createBean
      */
     private final List<BeanPostProcessor> beanPostProcessors = new ArrayList<>();
+
+    /**
+     * ClassLoader to resolve bean class names with, if necessary
+     */
+    private ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
+
+
+    public ClassLoader getBeanClassLoader() {
+        return this.beanClassLoader;
+    }
 
     /**
      * 获取bean
