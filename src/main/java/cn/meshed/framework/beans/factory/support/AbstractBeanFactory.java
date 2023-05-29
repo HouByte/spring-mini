@@ -1,6 +1,7 @@
 package cn.meshed.framework.beans.factory.support;
 
 import cn.meshed.framework.beans.BeansException;
+import cn.meshed.framework.beans.factory.FactoryBean;
 import cn.meshed.framework.beans.factory.config.BeanDefinition;
 import cn.meshed.framework.beans.factory.config.BeanPostProcessor;
 import cn.meshed.framework.beans.factory.config.ConfigurableBeanFactory;
@@ -12,10 +13,11 @@ import java.util.List;
 /**
  * <h1>Abstract BeanFactory</h1>
  * 抽象类定义模板方法
+ *
  * @author Vincent Vic
  * @version 1.0
  */
-public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry implements ConfigurableBeanFactory {
+public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport implements ConfigurableBeanFactory {
 
     /**
      * BeanPostProcessors to apply in createBean
@@ -41,11 +43,12 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
      */
     @Override
     public Object getBean(String beanName) throws BeansException {
-        return doGetBean(beanName,null);
+        return doGetBean(beanName, null);
     }
 
     /**
      * 获取bean
+     *
      * @param beanName
      * @return Object
      * @throws BeansException
@@ -88,13 +91,28 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
         return beanPostProcessors;
     }
 
-    protected Object doGetBean(String beanName, Object... args) throws BeansException {
-        Object bean = getSingleton(beanName);
-        if (bean != null){
-            return bean;
+    protected <T> T doGetBean(final String beanName, final Object... args) throws BeansException {
+        Object sharedInstance  = getSingleton(beanName);
+        if (sharedInstance  != null) {
+            return (T) getObjectForBeanInstance(sharedInstance, beanName);
         }
         BeanDefinition beanDefinition = getBeanDefinition(beanName);
-        return createBean(beanName,beanDefinition,args);
+        Object bean = createBean(beanName, beanDefinition, args);
+        return (T) getObjectForBeanInstance(bean, beanName);
+    }
+
+    private Object getObjectForBeanInstance(Object beanInstance, String beanName) {
+        if (!(beanInstance instanceof FactoryBean)){
+            // 如果是 FactoryBean，则需要调用 FactoryBean#getObject
+            return beanInstance;
+        }
+        Object object = getCacheObjectForFactoryBean(beanName);
+
+        if (object == null) {
+            FactoryBean<?> factoryBean = (FactoryBean<?>) beanInstance;
+            object = getObjectFromFactoryBean(factoryBean, beanName);
+        }
+        return object;
     }
 
     /**
@@ -108,6 +126,7 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
 
     /**
      * 获取bean 定义
+     *
      * @param beanName bean name
      * @return {@link BeanDefinition}
      */

@@ -6,6 +6,7 @@ import cn.meshed.framework.beans.BeansException;
 import cn.meshed.framework.beans.PropertyValue;
 import cn.meshed.framework.beans.factory.config.BeanDefinition;
 import cn.meshed.framework.beans.factory.config.BeanReference;
+import cn.meshed.framework.beans.factory.config.ConfigurableBeanFactory;
 import cn.meshed.framework.beans.factory.support.AbstractBeanDefinitionReader;
 import cn.meshed.framework.beans.factory.support.BeanDefinitionRegistry;
 import cn.meshed.framework.core.io.Resource;
@@ -42,7 +43,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
     @Override
     public void loadBeanDefinitions(Resource resource) throws BeansException {
         try {
-            try (InputStream inputStream = resource.getInputStream()){
+            try (InputStream inputStream = resource.getInputStream()) {
                 doLoadBeanDefinitions(inputStream);
             }
         } catch (IOException | ClassNotFoundException e) {
@@ -92,10 +93,11 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
 
     /**
      * 处理加载Bean定义核心方法
+     *
      * @param inputStream
      * @throws ClassNotFoundException
      */
-    private void doLoadBeanDefinitions(InputStream inputStream) throws ClassNotFoundException{
+    private void doLoadBeanDefinitions(InputStream inputStream) throws ClassNotFoundException {
         Document doc = XmlUtil.readXML(inputStream);
         Element root = doc.getDocumentElement();
         NodeList childNodes = root.getChildNodes();
@@ -105,7 +107,7 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
                 continue;
             }
             //忽略非bean标签
-            if (!"bean".equals(childNodes.item(i).getNodeName())){
+            if (!"bean".equals(childNodes.item(i).getNodeName())) {
                 continue;
             }
 
@@ -116,12 +118,13 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
             String className = bean.getAttribute("class");
             String initMethod = bean.getAttribute("init-method");
             String destroyMethod = bean.getAttribute("destroy-method");
+            String beanScope = bean.getAttribute("scope");
 
             //获取Class,方便取类中的名称
             Class<?> clazz = Class.forName(className);
             //bean 名称优先级： id > name
             String beanName = StrUtil.isNotEmpty(id) ? id : name;
-            if (StrUtil.isEmpty(beanName)){
+            if (StrUtil.isEmpty(beanName)) {
                 beanName = StrUtil.lowerFirst(clazz.getSimpleName());
             }
 
@@ -129,6 +132,13 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
             BeanDefinition beanDefinition = new BeanDefinition(clazz);
             beanDefinition.setInitMethodName(initMethod);
             beanDefinition.setDestroyMethodName(destroyMethod);
+
+            if (StrUtil.isNotBlank(beanScope)) {
+                if (!(ConfigurableBeanFactory.SCOPE_PROTOTYPE.equals(beanScope) || ConfigurableBeanFactory.SCOPE_SINGLETON.equals(beanScope))) {
+                    throw new BeansException("Scope invalid: " + beanScope);
+                }
+                beanDefinition.setScope(beanScope);
+            }
 
             //读取属性填充
             for (int j = 0; j < bean.getChildNodes().getLength(); j++) {
@@ -152,11 +162,11 @@ public class XmlBeanDefinitionReader extends AbstractBeanDefinitionReader {
                 PropertyValue propertyValue = new PropertyValue(attrName, value);
                 beanDefinition.getPropertyValues().addPropertyValue(propertyValue);
             }
-            if (getRegistry().containsBeanDefinition(beanName)){
+            if (getRegistry().containsBeanDefinition(beanName)) {
                 throw new BeansException("Duplicate beanName[" + beanName + "] is not allowed");
             }
 
-            getRegistry().registryBeanDefinition(beanName,beanDefinition);
+            getRegistry().registryBeanDefinition(beanName, beanDefinition);
         }
     }
 }
