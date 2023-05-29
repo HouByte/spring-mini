@@ -14,7 +14,7 @@ import org.junit.Test;
 public class ApiTest {
 
     @Test
-    public void test_context() {
+    public void test_aware() {
         ApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring-aware.xml");
 
         UserService userService = applicationContext.getBean("userService", UserService.class);
